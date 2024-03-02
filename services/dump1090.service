@@ -1,0 +1,14 @@
+[Unit]
+Description=Dump1090
+After=network.target
+
+[Service]
+ExecStart=/home/pi/dump1090/dump1090 --aggressive --net --net-http-port 8050 --ppm 60
+WorkingDirectory=/home/pi/dump1090
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

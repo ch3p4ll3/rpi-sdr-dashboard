@@ -1,0 +1,14 @@
+[Unit]
+Description=Virual Radar
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/mono ./VirtualRadar.exe -noGUI
+WorkingDirectory=/home/pi/VirtualRadar
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenWeb RX Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/openwebrx
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

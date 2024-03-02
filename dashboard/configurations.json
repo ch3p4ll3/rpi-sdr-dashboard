@@ -1,0 +1,91 @@
+{
+    "system": [
+        {
+            "name": "Poweroff",
+            "button_style": "btn-danger",
+            "icon": "bi bi-power",
+            "commands": [
+                "poweroff"
+            ]
+        },
+
+        {
+            "name": "Reboot",
+            "button_style": "btn-warning",
+            "icon": "bi bi-arrow-counterclockwise",
+            "commands": [
+                "reboot"
+            ]
+        }
+    ],
+
+    "services": [
+        {
+            "name": "RTL-TCP",
+            "description": "Run RTLTCP daemon only",
+            "start_commands": [
+                "rtltcp"
+            ],
+            "stop_commands": [
+                "rtltcp"
+            ]
+        },
+
+        {
+            "name": "ADSB",
+            "description": "Run ADSB pack (Dump1090, Virtual Radar)",
+            "start_commands": [
+                "dump1090",
+                "virtualRadar"
+            ],
+
+            "stop_commands": [
+                "dump1090",
+                "virtualRadar"
+            ],
+
+            "links": [
+                {
+                    "name": "Virtual Radar",
+                    "link": ":8080/VirtualRadar/"
+                }
+            ]
+        },
+
+        {
+            "name": "Auto RX",
+            "description": "Automatic Radiosonde Receiver Utilities",
+            "start_commands": [
+                "auto_rx"
+            ],
+
+            "stop_commands": [
+                "auto_rx"
+            ],
+            "links": [
+                {
+                    "name": "Auto Rx",
+                    "link": ":5000"
+                }
+            ]
+        },
+
+        {
+            "name": "OpenWebRx",
+            "description": "Run OpenWeb RX",
+            "start_commands": [
+                "openwebrx"
+            ],
+            "stop_commands": [
+                "openwebrx"
+            ],
+
+            "links": [
+                {
+                    "name": "OpenWebRx",
+                    "link": ":8090"
+                }
+            ]
+        }
+    ]
+}

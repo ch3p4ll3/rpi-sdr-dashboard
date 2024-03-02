@@ -1,0 +1,13 @@
+[Unit]
+Description=RTL-TCP
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/rtl_tcp -a 0.0.0.0 -P 60
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

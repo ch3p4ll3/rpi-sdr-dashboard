@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" href="/static/logo.png" type="image/x-icon">
+        <title>RPi-SDR Management</title>
+        <link href="/static/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/static/bootstrap-icons.min.css">
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <div class="position-relative">
+                <div class="btn-group position-absolute top-0 end-0 pt-3" role="group">
+                    {% for i in json_configs.system%}
+                        <div class="col">
+                            <button onclick="executeCommand(this)" class="btn {{i.button_style}}" title="{{i.name}}"><i class="{{i.icon}}"></i></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <h1 class="text-center pt-3">RPi-SDR Dashboard</h1>
+
+            <h4 class="text-center">RPi-SDR is in {% if hostapd_active %}AP{% else %}client {% endif %} mode</h4>
+            <h4 class="text-center active-config"> {% if active_config %}Active config: {{ active_config }}{% endif %}</h4>
+
+
+            <div class="row row-cols-1 row-cols-md-3 g-4 pt-5">
+                {% for i in json_configs.services %}
+                    <div class="col">
+                        
+                        {% if i.name == active_config %}
+                            <div class="card border-success">
+                        {% else %}
+                            <div class="card">
+                        {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title text-center">{{i.name}}</h5>
+                                <p class="pt-3">{{ i.description }}</p>
+
+                                {% if i.name == active_config %}
+                                    <button onclick="enable(this)" class="btn btn-primary disabled">Enable</button>
+                                {% else %}
+                                    <button onclick="enable(this)" href="#" class="btn btn-primary">Enable</button>
+                                {% endif %}
+
+                                {% if i.links %}
+                                <ul class="pt-3">
+                                    {% for link in i.links %}
+                                        <li>
+                                            <a href="{{server_ip}}{{link.link}}" target="_blank" rel="noopener noreferrer">{{link.name}}</a>
+                                        </li>    
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="row text-center pt-5">
+                <div class="col">
+                    <button class="btn btn-danger text-center" onclick="stopAllServices()">STOP ALL</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+        <script>
+            function getActiveConfig(){
+                const cards = document.getElementsByClassName("border-success");
+
+                return cards.length > 0 ? cards[0] : null;
+            }
+
+            function stopConfig(element){
+                const service_name = element.querySelector('.card-title').innerText;
+
+                fetch(`{{server_ip}}/stop_service/${service_name}`)
+                .then((response) => response.json())
+                .then((json) => {
+                    if (json.status){
+                        element.classList.remove("border-success");
+                        element.querySelector('.btn').classList.remove("disabled")
+                    }
+                });
+            }
+
+            function startConfig(element){
+                const service_name = element.parentElement.querySelector('.card-title').innerText;
+
+                fetch(`{{server_ip}}/start_service/${service_name}`)
+                .then((response) => response.json())
+                .then((json) => {
+                    if (json.status){
+                        element.parentElement.parentElement.classList.add("border-success");
+                        element.parentElement.querySelector('.btn').classList.add("disabled");
+                        document.querySelector(".active-config").innerText = `Active config: ${service_name}`;
+                    }
+                });
+            }
+
+            function enable(element){
+                let activeConf = getActiveConfig();
+
+                if (activeConf){
+                    stopConfig(activeConf);
+                }
+
+                startConfig(element)
+            }
+
+            function executeCommand(element){
+                command = element.getAttribute("title");
+
+                fetch(`{{server_ip}}/execute_command/${command}`)
+                .then((response) => response.json())
+                .then((json) => {
+                    console.log(json)
+                });;
+            }
+
+            function stopAllServices(){
+                fetch(`{{server_ip}}/stop_all_services`)
+                .then((response) => response.json())
+                .then((json) => {
+                    if(json.status){
+
+                        document.querySelectorAll(".card").forEach(element => {
+                            element.classList.remove("border-success");
+                        });
+
+                        document.querySelectorAll(".card .btn").forEach(element => {
+                            element.classList.remove("disabled");
+                        });
+                        document.querySelector(".active-config").innerText = ``;
+                    }
+                });;
+            }
+        </script>
+    </body>
+
+</html>
